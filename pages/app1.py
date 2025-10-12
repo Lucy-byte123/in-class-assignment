@@ -1,4 +1,11 @@
-# ...existing code...
+import streamlit as st
+import pandas as pd
+import seaborn as sns
+import matplotlib.pyplot as plt
+import warnings
+
+warnings.filterwarnings('ignore', message="Thread 'MainThread': missing ScriptRunContext!")
+sns.set_style("whitegrid")
 
 # --- Prediction Page ---
 st.header("Survival Prediction")
