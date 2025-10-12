@@ -1,47 +1,54 @@
 import streamlit as st
 import pandas as pd
-import matplotlib.pyplot as plt
 import seaborn as sns
-sns.set()
+import matplotlib.pyplot as plt
+import warnings
+
+warnings.filterwarnings('ignore', message="Thread 'MainThread': missing ScriptRunContext!")
+sns.set_style("whitegrid")
 
 
-st.title('World Cites')
-df = pd.read_csv('worldcities.csv')
+# Apply seaborn style for better aesthetics
+sns.set(style="whitegrid")
 
-# note that you have to use 0.0 and 40.0 given that the data type of population is float
-population_filter = st.slider('Minimal Population (Millions):', 0.0, 40.0, 3.6)  # min, max, default
+# Set the title of the app
+st.title("Titanic App by Xinzhi Zhang")
 
-# create a multi select
-capital_filter = st.sidebar.multiselect(
-     'Capital Selector',
-     df.capital.unique(),  # options
-     df.capital.unique())  # defaults
+# Load the Titanic dataset
+try:
+    try:
+        df = pd.read_csv('titanic.csv')
+    except:
+        df = pd.read_csv('titanic.csv')
+# Load and display the dataframe
+st.subheader("Titanic DataFrame")
 
-# create a input form
-form = st.sidebar.form("country_form")
-country_filter = form.text_input('Country Name (enter ALL to reset)', 'ALL')
-form.form_submit_button("Apply")
+# Display the entire DataFrame in the Streamlit app
+st.dataframe(df)
 
+# Create subplots for the boxplots
+fig, axes = plt.subplots(1, 3, figsize=(15, 5))
 
-# filter by population
-df = df[df.population >= population_filter]
+# Boxplot 1: Fare distribution for Pclass = 1
+sns.boxplot(x="Pclass", y="Fare", data=df[df["Pclass"] == 1], ax=axes[0])
+axes[0].set_title('Fare Distribution for Pclass 1')
+axes[0].set_xlabel('Passenger Class (Pclass)')
+axes[0].set_ylabel('Fare')
 
-# filter by capital
-df = df[df.capital.isin(capital_filter)]
+# Boxplot 2: Fare distribution for Pclass = 2
+sns.boxplot(x="Pclass", y="Fare", data=df[df["Pclass"] == 2], ax=axes[1])
+axes[1].set_title('Fare Distribution for Pclass 2')
+axes[1].set_xlabel('Passenger Class (Pclass)')
+axes[1].set_ylabel('Fare')
 
-if country_filter!='ALL':
-    df = df[df.country == country_filter]
+# Boxplot 3: Fare distribution for Pclass = 3
+sns.boxplot(x="Pclass", y="Fare", data=df[df["Pclass"] == 3], ax=axes[2])
+axes[2].set_title('Fare Distribution for Pclass 3')
+axes[2].set_xlabel('Passenger Class (Pclass)')
+axes[2].set_ylabel('Fare')
 
-# show on map
-st.map(df)
+# Adjust layout to avoid overlap
+plt.tight_layout()
 
-# show dataframe
-st.subheader('City Details:')
-st.write(df[['city', 'country', 'population']])
-
-# show the plot
-st.subheader('Total Population By Country')
-fig, ax = plt.subplots(figsize=(20, 5))
-pop_sum = df.groupby('country')['population'].sum()
-pop_sum.plot.bar(ax=ax)
+# Display the plot in the Streamlit app
 st.pyplot(fig)
