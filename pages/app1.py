@@ -4,7 +4,7 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 import warnings
 import os
-
+import pickle
 
 warnings.filterwarnings('ignore', message="Thread 'MainThread': missing ScriptRunContext!")
 sns.set_style("whitegrid")
@@ -42,7 +42,8 @@ if not os.path.exists(model_path):
     st.error(f"Error: The '{model_path}' file was not found. Please train and save your model as 'titanic_model.pkl'.")
 else:
     try:
-        model = joblib.load(model_path)
+        with open(model_path, "rb") as f:
+            model = pickle.load(f)
         st.subheader("Enter Passenger Information:")
 
         pclass = st.selectbox("Passenger Class", [1, 2, 3])
