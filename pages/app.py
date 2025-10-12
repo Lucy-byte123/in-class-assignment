@@ -1,47 +1,29 @@
 import streamlit as st
 import pandas as pd
-import matplotlib.pyplot as plt
 import seaborn as sns
-sns.set()
+import matplotlib.pyplot as plt
+import warnings
 
+warnings.filterwarnings('ignore')
+sns.set_style("whitegrid")
 
-st.title('World Cites')
-df = pd.read_csv('worldcities.csv')
+st.title("Titanic App by Xinzhi Zhang")
 
-# note that you have to use 0.0 and 40.0 given that the data type of population is float
-population_filter = st.slider('Minimal Population (Millions):', 0.0, 40.0, 3.6)  # min, max, default
+try:
+    df = pd.read_csv('train.csv')
+    st.subheader("Titanic DataFrame")
+    st.dataframe(df)
 
-# create a multi select
-capital_filter = st.sidebar.multiselect(
-     'Capital Selector',
-     df.capital.unique(),  # options
-     df.capital.unique())  # defaults
+    fig, axes = plt.subplots(1, 3, figsize=(15, 5))
+    for i, pclass in enumerate([1, 2, 3]):
+        class_data = df[df['Pclass'] == pclass]
+        sns.boxplot(y=class_data['Fare'], ax=axes[i])
+        axes[i].set_title(f'Pclass = {pclass}')
+        axes[i].set_xlabel('Passenger Class')
+        axes[i].set_ylabel('Fare')
+    plt.tight_layout()
+    st.subheader("Fare Distribution by Passenger Class")
+    st.pyplot(fig)
 
-# create a input form
-form = st.sidebar.form("country_form")
-country_filter = form.text_input('Country Name (enter ALL to reset)', 'ALL')
-form.form_submit_button("Apply")
-
-
-# filter by population
-df = df[df.population >= population_filter]
-
-# filter by capital
-df = df[df.capital.isin(capital_filter)]
-
-if country_filter!='ALL':
-    df = df[df.country == country_filter]
-
-# show on map
-st.map(df)
-
-# show dataframe
-st.subheader('City Details:')
-st.write(df[['city', 'country', 'population']])
-
-# show the plot
-st.subheader('Total Population By Country')
-fig, ax = plt.subplots(figsize=(20, 5))
-pop_sum = df.groupby('country')['population'].sum()
-pop_sum.plot.bar(ax=ax)
-st.pyplot(fig)
+except Exception as e:
+    st.error(f"An error occurred: {str(e)}")
