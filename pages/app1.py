@@ -41,19 +41,21 @@ model_path = "titanic_model.pkl"
 if not os.path.exists(model_path):
     st.error(f"Error: The '{model_path}' file was not found. Please train and save your model as 'titanic_model.pkl'.")
 else:
-    model = joblib.load(model_path)
+    try:
+        model = joblib.load(model_path)
+        st.subheader("Enter Passenger Information:")
 
-    st.subheader("Enter Passenger Information:")
+        pclass = st.selectbox("Passenger Class", [1, 2, 3])
+        sex = st.selectbox("Sex", ["male", "female"])
+        age = st.number_input("Age", min_value=0, max_value=100, value=30)
+        fare = st.number_input("Fare", min_value=0.0, max_value=600.0, value=32.0)
 
-    pclass = st.selectbox("Passenger Class", [1, 2, 3])
-    sex = st.selectbox("Sex", ["male", "female"])
-    age = st.number_input("Age", min_value=0, max_value=100, value=30)
-    fare = st.number_input("Fare", min_value=0.0, max_value=600.0, value=32.0)
+        # Encode inputs
+        sex_encoded = 1 if sex == "male" else 0
+        input_df = pd.DataFrame([[pclass, sex_encoded, age, fare]], columns=["Pclass", "Sex", "Age", "Fare"])
 
-    # Encode inputs
-    sex_encoded = 1 if sex == "male" else 0
-    input_df = pd.DataFrame([[pclass, sex_encoded, age, fare]], columns=["Pclass", "Sex", "Age", "Fare"])
-
-    if st.button("Predict Survival Probability"):
-        proba = model.predict_proba(input_df)[0][1]
-        st.success(f"Predicted Survival Probability: {proba:.2%}")
+        if st.button("Predict Survival Probability"):
+            proba = model.predict_proba(input_df)[0][1]
+            st.success(f"Predicted Survival Probability: {proba:.2%}")
+    except Exception as e:
+        st.error(f"Could not load or use the model: {str(e)}")
