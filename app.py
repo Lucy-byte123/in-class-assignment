@@ -21,34 +21,20 @@ try:
     except:
         df = pd.read_csv('titanic.csv')
 # Load and display the dataframe
-st.subheader("Titanic DataFrame")
+    st.subheader("Titanic DataFrame")
 
 # Display the entire DataFrame in the Streamlit app
-st.dataframe(df)
+    st.dataframe(df)
 
 # Create subplots for the boxplots
-fig, axes = plt.subplots(1, 3, figsize=(15, 5))
+   for i, pclass in enumerate([1, 2, 3]):
+         class_data = df[df['Pclass'] == pclass]
 
-# Boxplot 1: Fare distribution for Pclass = 1
-sns.boxplot(x="Pclass", y="Fare", data=df[df["Pclass"] == 1], ax=axes[0])
-axes[0].set_title('Fare Distribution for Pclass 1')
-axes[0].set_xlabel('Passenger Class (Pclass)')
-axes[0].set_ylabel('Fare')
+         sns.boxplot(y=class_data['Fare'], ax=axes[i])
 
-# Boxplot 2: Fare distribution for Pclass = 2
-sns.boxplot(x="Pclass", y="Fare", data=df[df["Pclass"] == 2], ax=axes[1])
-axes[1].set_title('Fare Distribution for Pclass 2')
-axes[1].set_xlabel('Passenger Class (Pclass)')
-axes[1].set_ylabel('Fare')
-
-# Boxplot 3: Fare distribution for Pclass = 3
-sns.boxplot(x="Pclass", y="Fare", data=df[df["Pclass"] == 3], ax=axes[2])
-axes[2].set_title('Fare Distribution for Pclass 3')
-axes[2].set_xlabel('Passenger Class (Pclass)')
-axes[2].set_ylabel('Fare')
-
-# Adjust layout to avoid overlap
-plt.tight_layout()
-
-# Display the plot in the Streamlit app
-st.pyplot(fig)
+         axes[i].set_title(f'Pclass = {pclass}')
+           axes[i].set_xlabel('Passenger Class')
+           axes[i].set_ylabel('Fare')
+    plt.tight_layout()
+    st.subheader("Fare Distribution by Passenger Class")
+    plt.tight_layout()        
